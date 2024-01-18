@@ -6,26 +6,32 @@ colours = (1..6).to_a
 code = []
 4.times { code.push(colours.sample) }
 
-guess = []
+guess = Array.new(4, 0)
 # Take guesses from user
 def take_input(guess)
   4.times do |index|
-    puts "Your guess for the #{index + 1} spot: "
-    guess[index] = gets.chomp
+    puts "Current guess: #{guess}"
+    print "Your guess for the #{index + 1} spot: "
+    # If input is empty/default, no change to the index value
+    input = gets.chomp.to_i
+    if input.zero?
+      puts "No change in value. Guess: #{guess}"
+      puts
+      next
+    end
+    guess[index] = input
+    puts "Guess after input: #{guess}"
+    puts
   end
-  guess
 end
 
-until cracked?(code, guess)
-  12.times do
+until guess == code
+  12.times do |n|
+    puts '-----------------------------------------------------'
+    puts "Row #{n + 1}"
+    puts '-----------------------------------------------------'
+    p code
     take_input(guess)
+    break if guess == code
   end
 end
-
-# Check if guesses match the code
-def cracked?(code, guess)
-  return true if guess == code
-
-  false
-end
-

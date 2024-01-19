@@ -1,66 +1,61 @@
 # frozen_string_literal: true
 
-# There are 6 possible colours in the game
-colours = (1..6).to_a
-# In each game, 4 SPOTS are filled with colours, duplicates allowed
-code = []
-4.times { code.push(colours.sample) }
+# the one that plays the role of CodeMaker
+class CodeMaker
+  attr_reader :code
 
-guess = Array.new(4, 0)
-# Take guesses from user
-def take_input(guess)
-  4.times do |index|
-    puts "Current guess: #{guess}"
-    print "Your guess for the #{index + 1} spot: "
-    # If input is empty/default, no change to the index value
-    input = gets.chomp.to_i
-    if input.zero?
-      puts "No change in value. Guess: #{guess}"
-      puts
-      next
+  def initialize
+    @code = random_digits
+  end
+
+  def random_digits
+    digits = (1..6).to_a
+    sample_digits = []
+    4.times { sample_digits.push(digits.sample) }
+    sample_digits
+  end
+
+  # temp method to ensure things are working well
+  def display
+    puts "Code: #{code.join(' ')} " # remove 'code' when game done!
+  end
+end
+
+# the one that tries to break the code; in this first case the Player
+class CodeBreaker
+  attr_accessor :guess
+
+  def initialize
+    @guess = Array.new(4, 0)
+  end
+
+  def ask_code
+    input = 'empty'
+    n = 0
+    until input.length == 4 && input.to_i.positive?
+      if n.zero?
+        print 'Enter the 4 digit code: '
+      else
+        print 'Please enter 4 digits and integers only. Try again: '
+      end
+      input = gets.chomp
+      n += 1
     end
-    guess[index] = input
-    puts "Guess after input: #{guess}"
-    puts
+    input
+  end
+
+  def update_guess
+    @guess = ask_code.split('')
+    display
+  end
+
+  def display
+    puts "Your guess: #{guess.join('')}"
   end
 end
 
-def correct_position(code, guess)
-  correct_pos_count = 0
-
-  code.each_with_index do |color, index|
-    correct_pos_count += 1 if color == guess[index]
-  end
-  correct_pos_count
+# controlling game flows from here
+class Game
 end
 
-def correct_color(code, guess)
-  color_count = code.each_with_object({}) { |color, hash| hash[color] = code.count(color) }
-
-  guess_in_code = guess.select { |color| code.include?(color) }
-  guess_in_code_count = guess_in_code.each_with_object({}) { |color, hash| hash[color] = guess_in_code.count(color) }
-
-  correct_color_hash = {}
-  guess_in_code_count.each_pair do |key, value|
-    correct_color_hash[key] = if value < color_count[key]
-                                value
-                              else
-                                color_count[key]
-                              end
-  end
-
-  correct_color_hash.values.sum
-end
-
-until guess == code
-  12.times do |n|
-    puts '-----------------------------------------------------'
-    puts "Row #{n + 1}"
-    puts '-----------------------------------------------------'
-    p code
-    take_input(guess)
-    puts "#{correct_position(code, guess)} guess are in the right place."
-    puts "#{correct_color(code, guess)} color guess are correct."
-    break if guess == code
-  end
-end
+CodeBreaker.new.update_guess

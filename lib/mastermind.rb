@@ -25,6 +25,33 @@ def take_input(guess)
   end
 end
 
+def correct_position(code, guess)
+  correct_pos_count = 0
+
+  code.each_with_index do |color, index|
+    correct_pos_count += 1 if color == guess[index]
+  end
+  correct_pos_count
+end
+
+def correct_color(code, guess)
+  color_count = code.each_with_object({}) { |color, hash| hash[color] = code.count(color) }
+
+  guess_in_code = guess.select { |color| code.include?(color) }
+  guess_in_code_count = guess_in_code.each_with_object({}) { |color, hash| hash[color] = guess_in_code.count(color) }
+
+  correct_color_hash = {}
+  guess_in_code_count.each_pair do |key, value|
+    correct_color_hash[key] = if value < color_count[key]
+                                value
+                              else
+                                color_count[key]
+                              end
+  end
+
+  correct_color_hash.values.sum
+end
+
 until guess == code
   12.times do |n|
     puts '-----------------------------------------------------'
@@ -32,6 +59,8 @@ until guess == code
     puts '-----------------------------------------------------'
     p code
     take_input(guess)
+    puts "#{correct_position(code, guess)} guess are in the right place."
+    puts "#{correct_color(code, guess)} color guess are correct."
     break if guess == code
   end
 end

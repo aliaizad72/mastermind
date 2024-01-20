@@ -64,19 +64,39 @@ class Game
   end
 
   def play
+    # intro
+    puts 'Welcome to Mastermind. In this game, you will have to crack a 4 digit code (numbers only from 1 to 6) set by the computer.'
+    puts "You have 12 chances to guess the code. Get crackin."
+    puts
     i = 1
     until i > 12 || all_correct?
-      current_maker.display_code
       puts "Round #{i}"
       current_guesser.update_guess
-      p all_correct?
-
+      puts feedback
+      puts
       i += 1
     end
   end
 
   def all_correct?
     current_guesser.guess == current_maker.code
+  end
+
+  def feedback
+    hijau_pegs = correct_position
+    putih_pegs = correct_digit_only
+
+    putih_pegs -= hijau_pegs if putih_pegs.positive? && hijau_pegs.positive?
+    
+    if hijau_pegs.positive? && putih_pegs.positive?
+      "#{hijau_pegs} digit(s) are at the right position, while #{putih_pegs} digit(s) are the right digit(s), but at the wrong position."
+    elsif hijau_pegs.positive? && putih_pegs.zero?
+      "#{hijau_pegs} digit(s) are at the right position."
+    elsif hijau_pegs.zero? && putih_pegs.positive?
+      "#{putih_pegs} digit(s) are the right digit(s), but at the wrong position."
+    else
+      'None of the digits in the guesses are in the code.'
+    end
   end
 
   def correct_position
@@ -87,6 +107,23 @@ class Game
     end
 
     correct_pos_count
+  end
+
+  def correct_digit_only
+    correct_digit_count = 0
+    digits_in_code_and_guess = current_guesser.guess.select { |digit| current_maker.code.include?(digit) }.uniq
+
+    digits_in_code_and_guess.each do |digit|
+      digit_count_in_code = current_maker.code.count(digit)
+      digit_count_in_guess = current_guesser.guess.count(digit)
+
+      correct_digit_count += if digit_count_in_guess < digit_count_in_code
+                               digit_count_in_guess
+                             else
+                               digit_count_in_code
+                             end
+    end
+    correct_digit_count
   end
 end
 

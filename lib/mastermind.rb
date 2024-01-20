@@ -17,7 +17,7 @@ class CodeMaker
 
   # temp method to ensure things are working well
   def display
-    puts "Code: #{code.join(' ')} " # remove 'code' when game done!
+    puts "Code: #{code.join('')} " # remove 'code' when game done!
   end
 end
 
@@ -56,6 +56,25 @@ end
 
 # controlling game flows from here
 class Game
+  attr_reader :current_maker, :current_guesser
+
+  def initialize
+    @current_maker = CodeMaker.new
+    @current_guesser = CodeBreaker.new
+  end
+
+  def play
+    i = 0
+    until i > 11 && all_correct?
+      current_guesser.update_guess
+      p all_correct?
+      i += 1
+    end
+  end
+
+  def all_correct?
+    current_guesser.guess == current_maker
+  end
 end
 
-CodeBreaker.new.update_guess
+Game.new.play

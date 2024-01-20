@@ -16,7 +16,7 @@ class CodeMaker
   end
 
   # temp method to ensure things are working well
-  def display
+  def display_code
     puts "Code: #{code.join('')} " # remove 'code' when game done!
   end
 end
@@ -45,7 +45,7 @@ class CodeBreaker
   end
 
   def update_guess
-    @guess = ask_code.split('')
+    @guess = ask_code.split('').map(&:to_i)
     display
   end
 
@@ -64,16 +64,29 @@ class Game
   end
 
   def play
-    i = 0
-    until i > 11 && all_correct?
+    i = 1
+    until i > 12 || all_correct?
+      current_maker.display_code
+      puts "Round #{i}"
       current_guesser.update_guess
       p all_correct?
+
       i += 1
     end
   end
 
   def all_correct?
-    current_guesser.guess == current_maker
+    current_guesser.guess == current_maker.code
+  end
+
+  def correct_position
+    correct_pos_count = 0
+
+    current_maker.code.each_with_index do |digit, index|
+      correct_pos_count += 1 if digit == current_guesser.guess[index]
+    end
+
+    correct_pos_count
   end
 end
 

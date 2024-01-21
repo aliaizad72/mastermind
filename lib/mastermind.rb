@@ -64,18 +64,22 @@ class Game
   end
 
   def play
-    # intro
-    puts 'Welcome to Mastermind. In this game, you will have to crack a 4 digit code (numbers only from 1 to 6) set by the computer.'
-    puts "You have 12 chances to guess the code. Get crackin."
-    puts
+    intro
     i = 1
     until i > 12 || all_correct?
       puts "Round #{i}"
       current_guesser.update_guess
-      puts feedback
+      feedback
       puts
       i += 1
     end
+    
+  end
+
+  def intro
+    puts 'Welcome to Mastermind. In this game, you will have to crack a 4 digit code (numbers only from 1 to 6) set by the computer.'
+    puts 'You have 12 chances to guess the code. Get crackin.'
+    puts
   end
 
   def all_correct?
@@ -83,23 +87,23 @@ class Game
   end
 
   def feedback
-    hijau_pegs = correct_position
-    putih_pegs = correct_digit_only
+    pos_count = count_correct_pos
+    digit_count = count_correct_digit
 
-    putih_pegs -= hijau_pegs if putih_pegs.positive? && hijau_pegs.positive?
-    
-    if hijau_pegs.positive? && putih_pegs.positive?
-      "#{hijau_pegs} digit(s) are at the right position, while #{putih_pegs} digit(s) are the right digit(s), but at the wrong position."
-    elsif hijau_pegs.positive? && putih_pegs.zero?
-      "#{hijau_pegs} digit(s) are at the right position."
-    elsif hijau_pegs.zero? && putih_pegs.positive?
-      "#{putih_pegs} digit(s) are the right digit(s), but at the wrong position."
-    else
-      'None of the digits in the guesses are in the code.'
+    digit_count -= pos_count if digit_count.positive? && pos_count.positive?
+
+    if pos_count.positive?
+      puts "#{pos_count} #{digit_quantity(pos_count)} at the right #{position_quantity(pos_count)}."
     end
+
+    if digit_count.positive?
+      puts "#{digit_count} #{digit_quantity(digit_count)} the right #{integer_quantity(digit_count)} but at the wrong #{position_quantity(digit_count)}."
+    end
+
+    puts 'None of the digits in the guesses are in the code.' if pos_count.zero? && digit_count.zero?
   end
 
-  def correct_position
+  def count_correct_pos
     correct_pos_count = 0
 
     current_maker.code.each_with_index do |digit, index|
@@ -109,7 +113,7 @@ class Game
     correct_pos_count
   end
 
-  def correct_digit_only
+  def count_correct_digit
     correct_digit_count = 0
     digits_in_code_and_guess = current_guesser.guess.select { |digit| current_maker.code.include?(digit) }.uniq
 
@@ -124,6 +128,30 @@ class Game
                              end
     end
     correct_digit_count
+  end
+
+  def digit_quantity(digit)
+    if digit == 1
+      'digit is'
+    else
+      'digits are'
+    end
+  end
+
+  def integer_quantity(digit)
+    if digit == 1
+      'integer'
+    else
+      'integers'
+    end
+  end
+
+  def position_quantity(digit)
+    if digit == 1
+      'position'
+    else
+      'positions'
+    end
   end
 end
 

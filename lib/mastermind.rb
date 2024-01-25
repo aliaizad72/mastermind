@@ -1,14 +1,32 @@
 # frozen_string_literal: true
 
-# Human, not yet open to other roles, only for codebreaker
-class Human
-  attr_accessor :digit_array
-  attr_reader :role
+# the one that plays the role of CodeMaker
+class CodeMaker
+  attr_reader :code
 
-  def initialize(role)
-    @role = role.new
-    @role.intro
-    @digit_array = set_digit_array
+  def initialize
+    @code = random_digits
+  end
+
+  def random_digits
+    digits = (1..6).to_a
+    sample_digits = []
+    4.times { sample_digits.push(digits.sample) }
+    sample_digits
+  end
+
+  # temp method to ensure things are working well
+  def display_code
+    puts "Code: #{code.join('')} " # remove 'code' when game done!
+  end
+end
+
+# the one that tries to break the code; in this first case the Player
+class CodeBreaker
+  attr_accessor :guess
+
+  def initialize
+    @guess = Array.new(4, 0)
   end
 
   def ask_code
@@ -26,125 +44,46 @@ class Human
     input
   end
 
-  def set_digit_array
-    if role.is_a? CodeMaker
-      ask_code.split('').map(&:to_i)
-    else
-      Array.new(4, 0)
-    end
-  end
-
-  def update_digit_array
-    @digit_array = ask_code.split('').map(&:to_i)
+  def update_guess
+    @guess = ask_code.split('').map(&:to_i)
     display
   end
 
   def display
-    puts "Your #{role.array_name}: #{digit_array.join('')}"
-  end
-end
-
-# class Computer for Player's opponent
-class Computer
-  attr_accessor :digit_array
-  attr_reader :role
-
-  def initialize(role)
-    @role = role.new
-    @digit_array = random_digits
-  end
-
-  def update_digit_array
-    current_array = random_digits
-    puts "Computer #{role.array_name}: #{current_array}"
-    current_array
-  end
-
-  def random_digits
-    digits = (1..6).to_a
-    sample_digits = []
-    4.times { sample_digits.push(digits.sample) }
-    sample_digits
-  end
-end
-
-# the one that plays the role of CodeMaker
-class CodeMaker
-  attr_reader :array_name
-
-  def initialize
-    @array_name = 'code'
-  end
-
-  def intro
-    puts 'Welcome to Mastermind. As a CodeMaker, your role is simple, enter a 4 digit number (1 to 6) as your code.'
-    puts 'Duplicate numbers are allowed. Good luck.'
-    puts
-  end
-end
-
-# the one that tries to break the code; in this first case the Player
-class CodeBreaker
-  attr_reader :array_name
-
-  def initialize
-    @array_name = 'guess'
-  end
-
-  def intro
-    puts 'Welcome to Mastermind. In this game, you will have to crack a 4 digit code (1 to 6) set by the computer.'
-    puts 'You have 12 chances to guess the code. Get crackin.'
-    puts
+    puts "Your guess: #{guess.join('')}"
   end
 end
 
 # controlling game flows from here
 class Game
-  attr_accessor :computer, :human
+  attr_reader :current_maker, :current_guesser
 
   def initialize
-    assign_role
-  end
-
-  def assign_role
-    roles = [CodeMaker, CodeBreaker]
-
-    human_role = roles.delete(ask_role)
-    computer_role = roles[0]
-
-    @human = Human.new(human_role)
-    @computer = Computer.new(computer_role)
-  end
-
-  def ask_role
-    input = '0'
-    i = 0
-
-    until %w[1 2].include?(input)
-      print 'Enter 1 to be the CodeMaker, or enter 2 to be the CodeBreaker: ' if i.zero?
-      print 'Please enter 1 or 2 only! Try again: ' if i.positive?
-      input = gets.chomp
-      i += 1
-    end
-    return CodeMaker if input == '1'
-
-    CodeBreaker if input == '2'
+    @current_maker = CodeMaker.new
+    @current_guesser = CodeBreaker.new
   end
 
   def play
+    intro
     i = 1
     until i > 12 || all_correct?
       puts "Round #{i}"
-      human.update_digit_array if human.role.is_a? CodeBreaker
-      computer.update_digit_array if computer.role.is_a? CodeBreaker
+      current_guesser.update_guess
       feedback
       puts
       i += 1
     end
+    
+  end
+
+  def intro
+    puts 'Welcome to Mastermind. In this game, you will have to crack a 4 digit code (numbers only from 1 to 6) set by the computer.'
+    puts 'You have 12 chances to guess the code. Get crackin.'
+    puts
   end
 
   def all_correct?
-    human.digit_array == computer.digit_array
+    current_guesser.guess == current_maker.code
   end
 
   def feedback
@@ -167,8 +106,8 @@ class Game
   def count_correct_pos
     correct_pos_count = 0
 
-    computer.digit_array.each_with_index do |digit, index|
-      correct_pos_count += 1 if digit == human.digit_array[index]
+    current_maker.code.each_with_index do |digit, index|
+      correct_pos_count += 1 if digit == current_guesser.guess[index]
     end
 
     correct_pos_count
@@ -176,11 +115,11 @@ class Game
 
   def count_correct_digit
     correct_digit_count = 0
-    digits_in_code_and_guess = human.digit_array.select { |digit| computer.digit_array.include?(digit) }.uniq
+    digits_in_code_and_guess = current_guesser.guess.select { |digit| current_maker.code.include?(digit) }.uniq
 
     digits_in_code_and_guess.each do |digit|
-      digit_count_in_code = computer.digit_array.count(digit)
-      digit_count_in_guess = human.digit_array.count(digit)
+      digit_count_in_code = current_maker.code.count(digit)
+      digit_count_in_guess = current_guesser.guess.count(digit)
 
       correct_digit_count += if digit_count_in_guess < digit_count_in_code
                                digit_count_in_guess

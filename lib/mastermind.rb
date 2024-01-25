@@ -7,7 +7,8 @@ class Human
 
   def initialize(role)
     @role = role.new
-    @digit_array = Array.new(4, 0)
+    @role.intro
+    @digit_array = set_digit_array
   end
 
   def ask_code
@@ -23,6 +24,14 @@ class Human
       n += 1
     end
     input
+  end
+
+  def set_digit_array
+    if role.is_a? CodeMaker
+      ask_code.split('').map(&:to_i)
+    else
+      Array.new(4, 0)
+    end
   end
 
   def update_digit_array
@@ -42,11 +51,20 @@ class Computer
 
   def initialize(role)
     @role = role.new
-    @digit_array = update_digit_array
+    @digit_array = random_digits
   end
 
   def update_digit_array
-    role.random_digits if role.is_a? CodeMaker
+    current_array = random_digits
+    puts "Computer #{role.array_name}: #{current_array}"
+    current_array
+  end
+
+  def random_digits
+    digits = (1..6).to_a
+    sample_digits = []
+    4.times { sample_digits.push(digits.sample) }
+    sample_digits
   end
 end
 
@@ -56,13 +74,6 @@ class CodeMaker
 
   def initialize
     @array_name = 'code'
-  end
-
-  def random_digits
-    digits = (1..6).to_a
-    sample_digits = []
-    4.times { sample_digits.push(digits.sample) }
-    sample_digits
   end
 
   def intro
@@ -121,23 +132,11 @@ class Game
   end
 
   def play
-    human.role.intro
-    if human.role.is_a? CodeMaker
-      play_codemaker
-    else
-      play_codebreaker
-    end
-  end
-
-  def play_codemaker
-    
-  end
-
-  def play_codebreaker
     i = 1
     until i > 12 || all_correct?
       puts "Round #{i}"
-      human.update_digit_array
+      human.update_digit_array if human.role.is_a? CodeBreaker
+      computer.update_digit_array if computer.role.is_a? CodeBreaker
       feedback
       puts
       i += 1

@@ -30,10 +30,15 @@ end
 
 # the one that plays the role of CodeMaker
 class CodeMaker
-  attr_reader :code
+  attr_accessor :player, :code
 
   def initialize
-    @code = Computer.random_digits
+    @player = Computer
+    @code = set_code
+  end
+
+  def set_code
+    Computer.random_digits if player == Computer
   end
 
   # temp method to ensure things are working well

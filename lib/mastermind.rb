@@ -56,11 +56,11 @@ end
 
 # controlling game flows from here
 class Game
-  attr_reader :current_maker, :current_guesser
+  attr_reader :codemaker, :codebreaker
 
   def initialize
-    @current_maker = CodeMaker.new
-    @current_guesser = CodeBreaker.new
+    @codemaker = CodeMaker.new
+    @codebreaker = CodeBreaker.new
   end
 
   def play
@@ -68,12 +68,11 @@ class Game
     i = 1
     until i > 12 || all_correct?
       puts "Round #{i}"
-      current_guesser.update_guess
+      codebreaker.update_guess
       feedback
       puts
       i += 1
     end
-    
   end
 
   def intro
@@ -83,7 +82,7 @@ class Game
   end
 
   def all_correct?
-    current_guesser.guess == current_maker.code
+    codebreaker.guess == codemaker.code
   end
 
   def feedback
@@ -106,8 +105,8 @@ class Game
   def count_correct_pos
     correct_pos_count = 0
 
-    current_maker.code.each_with_index do |digit, index|
-      correct_pos_count += 1 if digit == current_guesser.guess[index]
+    codemaker.code.each_with_index do |digit, index|
+      correct_pos_count += 1 if digit == codebreaker.guess[index]
     end
 
     correct_pos_count
@@ -115,11 +114,11 @@ class Game
 
   def count_correct_digit
     correct_digit_count = 0
-    digits_in_code_and_guess = current_guesser.guess.select { |digit| current_maker.code.include?(digit) }.uniq
+    digits_in_code_and_guess = codebreaker.guess.select { |digit| codemaker.code.include?(digit) }.uniq
 
     digits_in_code_and_guess.each do |digit|
-      digit_count_in_code = current_maker.code.count(digit)
-      digit_count_in_guess = current_guesser.guess.count(digit)
+      digit_count_in_code = codemaker.code.count(digit)
+      digit_count_in_guess = codebreaker.guess.count(digit)
 
       correct_digit_count += if digit_count_in_guess < digit_count_in_code
                                digit_count_in_guess

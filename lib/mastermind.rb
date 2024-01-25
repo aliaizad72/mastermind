@@ -17,19 +17,23 @@ class Human
     input
   end
 end
+
+# class Computer for methods that are specific to the computer
+class Computer
+  def self.random_digits
+    digits = (1..6).to_a
+    sample_digits = []
+    4.times { sample_digits.push(digits.sample) }
+    sample_digits
+  end
+end
+
 # the one that plays the role of CodeMaker
 class CodeMaker
   attr_reader :code
 
   def initialize
-    @code = random_digits
-  end
-
-  def random_digits
-    digits = (1..6).to_a
-    sample_digits = []
-    4.times { sample_digits.push(digits.sample) }
-    sample_digits
+    @code = Computer.random_digits
   end
 
   # temp method to ensure things are working well

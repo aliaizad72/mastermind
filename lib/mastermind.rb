@@ -16,6 +16,10 @@ class Human
     end
     input
   end
+
+  def self.update_array
+    Human.ask_code.split('').map(&:to_i)
+  end
 end
 
 # class Computer for methods that are specific to the computer
@@ -30,15 +34,20 @@ end
 
 # the one that plays the role of CodeMaker
 class CodeMaker
-  attr_accessor :player, :code
+  attr_accessor :computer, :human, :code
 
   def initialize
-    @player = Computer
+    @computer = true
+    @human = false
     @code = set_code
   end
 
   def set_code
-    Computer.random_digits if player == Computer
+    if computer
+      Computer.random_digits
+    elsif human
+      Human.update_array
+    end
   end
 
   # temp method to ensure things are working well
@@ -56,7 +65,7 @@ class CodeBreaker
   end
 
   def update_guess
-    @guess = Human.ask_code.split('').map(&:to_i)
+    @guess = Human.update_array
     display
   end
 

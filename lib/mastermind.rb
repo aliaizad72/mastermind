@@ -6,8 +6,8 @@ class Human
   attr_reader :role
 
   def initialize(role = CodeBreaker.new)
-    @digit_array = Array.new(4, 0)
     @role = role
+    @digit_array = Array.new(4, 0)
   end
 
   def ask_code
@@ -35,24 +35,38 @@ class Human
   end
 end
 
-# the one that plays the role of CodeMaker
-class CodeMaker
-  attr_reader :code
+# class Computer for Player's opponent
+class Computer
+  attr_reader :digit_array, :role
 
-  def initialize
-    @code = random_digits
+  def initialize(role = CodeMaker.new)
+    @role = role
+    @digit_array = update_digit_array
   end
 
-  def random_digits
+  def update_digit_array
+    role.update_digit_array
+  end
+
+  # temp method to ensure things are working well
+  def display_digit_array
+    puts "#{role.array_name.capitalize}: #{digit_array.join('')} " # remove 'code' when game done!
+  end
+end
+
+# the one that plays the role of CodeMaker
+class CodeMaker
+  attr_reader :array_name
+
+  def initialize
+    @array_name = 'code'
+  end
+
+  def update_digit_array
     digits = (1..6).to_a
     sample_digits = []
     4.times { sample_digits.push(digits.sample) }
     sample_digits
-  end
-
-  # temp method to ensure things are working well
-  def display_code
-    puts "Code: #{code.join('')} " # remove 'code' when game done!
   end
 end
 
@@ -70,7 +84,7 @@ class Game
   attr_reader :computer, :human
 
   def initialize
-    @computer = CodeMaker.new
+    @computer = Computer.new
     @human = Human.new
   end
 
@@ -93,7 +107,7 @@ class Game
   end
 
   def all_correct?
-    human.digit_array == computer.code
+    human.digit_array == computer.digit_array
   end
 
   def feedback
@@ -116,7 +130,7 @@ class Game
   def count_correct_pos
     correct_pos_count = 0
 
-    computer.code.each_with_index do |digit, index|
+    computer.digit_array.each_with_index do |digit, index|
       correct_pos_count += 1 if digit == human.digit_array[index]
     end
 
@@ -125,10 +139,10 @@ class Game
 
   def count_correct_digit
     correct_digit_count = 0
-    digits_in_code_and_guess = human.digit_array.select { |digit| computer.code.include?(digit) }.uniq
+    digits_in_code_and_guess = human.digit_array.select { |digit| computer.digit_array.include?(digit) }.uniq
 
     digits_in_code_and_guess.each do |digit|
-      digit_count_in_code = computer.code.count(digit)
+      digit_count_in_code = computer.digit_array.count(digit)
       digit_count_in_guess = human.digit_array.count(digit)
 
       correct_digit_count += if digit_count_in_guess < digit_count_in_code

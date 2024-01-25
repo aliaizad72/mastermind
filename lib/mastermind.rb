@@ -1,5 +1,22 @@
 # frozen_string_literal: true
 
+# class Human for methods that are only specific to the user
+class Human
+  def self.ask_code
+    input = 'empty'
+    n = 0
+    until input.length == 4 && input.to_i.positive?
+      if n.zero?
+        print 'Enter the 4 digit code: '
+      else
+        print 'Please enter 4 digits and integers only. Try again: '
+      end
+      input = gets.chomp
+      n += 1
+    end
+    input
+  end
+end
 # the one that plays the role of CodeMaker
 class CodeMaker
   attr_reader :code
@@ -29,23 +46,8 @@ class CodeBreaker
     @guess = Array.new(4, 0)
   end
 
-  def ask_code
-    input = 'empty'
-    n = 0
-    until input.length == 4 && input.to_i.positive?
-      if n.zero?
-        print 'Enter the 4 digit code: '
-      else
-        print 'Please enter 4 digits and integers only. Try again: '
-      end
-      input = gets.chomp
-      n += 1
-    end
-    input
-  end
-
   def update_guess
-    @guess = ask_code.split('').map(&:to_i)
+    @guess = Human.ask_code.split('').map(&:to_i)
     display
   end
 

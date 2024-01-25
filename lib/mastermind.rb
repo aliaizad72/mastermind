@@ -5,8 +5,8 @@ class Human
   attr_accessor :digit_array
   attr_reader :role
 
-  def initialize(role = CodeBreaker.new)
-    @role = role
+  def initialize(role)
+    @role = role.new
     @digit_array = Array.new(4, 0)
   end
 
@@ -37,20 +37,16 @@ end
 
 # class Computer for Player's opponent
 class Computer
-  attr_reader :digit_array, :role
+  attr_accessor :digit_array
+  attr_reader :role
 
-  def initialize(role = CodeMaker.new)
-    @role = role
+  def initialize(role)
+    @role = role.new
     @digit_array = update_digit_array
   end
 
   def update_digit_array
-    role.update_digit_array
-  end
-
-  # temp method to ensure things are working well
-  def display_digit_array
-    puts "#{role.array_name.capitalize}: #{digit_array.join('')} " # remove 'code' when game done!
+    role.random_digits if role.is_a? CodeMaker
   end
 end
 
@@ -62,11 +58,17 @@ class CodeMaker
     @array_name = 'code'
   end
 
-  def update_digit_array
+  def random_digits
     digits = (1..6).to_a
     sample_digits = []
     4.times { sample_digits.push(digits.sample) }
     sample_digits
+  end
+
+  def intro
+    puts 'Welcome to Mastermind. As a CodeMaker, your role is simple, enter a 4 digit number (1 to 6) as your code.'
+    puts 'Duplicate numbers are allowed. Good luck.'
+    puts
   end
 end
 
@@ -77,19 +79,61 @@ class CodeBreaker
   def initialize
     @array_name = 'guess'
   end
+
+  def intro
+    puts 'Welcome to Mastermind. In this game, you will have to crack a 4 digit code (1 to 6) set by the computer.'
+    puts 'You have 12 chances to guess the code. Get crackin.'
+    puts
+  end
 end
 
 # controlling game flows from here
 class Game
-  attr_reader :computer, :human
+  attr_accessor :computer, :human
 
   def initialize
-    @computer = Computer.new
-    @human = Human.new
+    assign_role
+  end
+
+  def assign_role
+    roles = [CodeMaker, CodeBreaker]
+
+    human_role = roles.delete(ask_role)
+    computer_role = roles[0]
+
+    @human = Human.new(human_role)
+    @computer = Computer.new(computer_role)
+  end
+
+  def ask_role
+    input = '0'
+    i = 0
+
+    until %w[1 2].include?(input)
+      print 'Enter 1 to be the CodeMaker, or enter 2 to be the CodeBreaker: ' if i.zero?
+      print 'Please enter 1 or 2 only! Try again: ' if i.positive?
+      input = gets.chomp
+      i += 1
+    end
+    return CodeMaker if input == '1'
+
+    CodeBreaker if input == '2'
   end
 
   def play
-    intro
+    human.role.intro
+    if human.role.is_a? CodeMaker
+      play_codemaker
+    else
+      play_codebreaker
+    end
+  end
+
+  def play_codemaker
+    
+  end
+
+  def play_codebreaker
     i = 1
     until i > 12 || all_correct?
       puts "Round #{i}"
@@ -98,12 +142,6 @@ class Game
       puts
       i += 1
     end
-  end
-
-  def intro
-    puts 'Welcome to Mastermind. In this game, you will have to crack a 4 digit code (numbers only from 1 to 6) set by the computer.'
-    puts 'You have 12 chances to guess the code. Get crackin.'
-    puts
   end
 
   def all_correct?
@@ -178,4 +216,5 @@ class Game
     end
   end
 end
+
 Game.new.play

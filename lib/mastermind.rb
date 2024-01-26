@@ -106,13 +106,17 @@ class Game
   def create_players
     human_role = Human.ask_role
 
-    if human_role == 'codemaker'
-      @codemaker = CodeMaker.new(computer: false, human: true)
-      @codebreaker = CodeBreaker.new(computer: true, human: false)
-    else
-      @codemaker = CodeMaker.new(computer: true, human: false)
-      @codebreaker = CodeBreaker.new(computer: false, human: true)
-    end
+    @codemaker = if human_role == 'codemaker'
+                   CodeMaker.new(computer: false, human: true)
+                 else
+                   CodeMaker.new(computer: true, human: false)
+                 end
+
+    @codebreaker = if human_role == 'codebreaker'
+                     CodeBreaker.new(computer: false, human: true)
+                   else
+                     CodeBreaker.new(computer: true, human: false)
+                   end
   end
 
   def play

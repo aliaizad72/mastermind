@@ -100,8 +100,19 @@ class Game
   attr_reader :codemaker, :codebreaker
 
   def initialize
-    @codemaker = CodeMaker.new
-    @codebreaker = CodeBreaker.new
+    create_players
+  end
+
+  def create_players
+    human_role = Human.ask_role
+
+    if human_role == 'codemaker'
+      @codemaker = CodeMaker.new(computer: false, human: true)
+      @codebreaker = CodeBreaker.new(computer: true, human: false)
+    else
+      @codemaker = CodeMaker.new(computer: true, human: false)
+      @codebreaker = CodeBreaker.new(computer: false, human: true)
+    end
   end
 
   def play

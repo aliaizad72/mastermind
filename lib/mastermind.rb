@@ -2,6 +2,21 @@
 
 # class Human for methods that are only specific to the user
 class Human
+  def self.ask_role
+    input = '0'
+    i = 0
+
+    until %w[1 2].include?(input)
+      print 'Enter 1 to be the CodeMaker, or enter 2 to be the CodeBreaker: ' if i.zero?
+      print 'Please enter 1 or 2 only! Try again: ' if i.positive?
+      input = gets.chomp
+      i += 1
+    end
+    return 'codemaker' if input == '1'
+
+    'codebreaker' if input == '2'
+  end
+
   def self.ask_code
     input = 'empty'
     n = 0
@@ -36,9 +51,9 @@ end
 class CodeMaker
   attr_accessor :computer, :human, :code
 
-  def initialize
-    @computer = true
-    @human = false
+  def initialize(computer: true, human: false)
+    @computer = computer
+    @human = human
     @code = set_code
   end
 
@@ -60,9 +75,9 @@ end
 class CodeBreaker
   attr_accessor :computer, :human, :guess
 
-  def initialize
-    @computer = false
-    @human = true
+  def initialize(computer: false, human: true)
+    @computer = computer
+    @human = human
     @guess = [0, 0, 0, 0]
   end
 

@@ -54,15 +54,15 @@ class CodeMaker
   def initialize(computer: true, human: false)
     @computer = computer
     @human = human
-    @code = set_code
+    @code = [0, 0, 0, 0]
   end
 
   def set_code
-    if computer
-      Computer.random_digits
-    elsif human
-      Human.update_array
-    end
+    @code = if computer
+              Computer.random_digits
+            elsif human
+              Human.update_array
+            end
   end
 
   # temp method to ensure things are working well
@@ -101,6 +101,8 @@ class Game
 
   def initialize
     create_players
+    intro
+    @codemaker.set_code
   end
 
   def create_players
@@ -120,7 +122,6 @@ class Game
   end
 
   def play
-    intro
     i = 1
     until i > 12 || all_correct?
       puts "Round #{i}"
@@ -132,7 +133,24 @@ class Game
   end
 
   def intro
-    puts 'Welcome to Mastermind. In this game, you will have to crack a 4 digit code (numbers only from 1 to 6) set by the computer.'
+    puts 'Welcome to Mastermind.'
+    if codemaker.human
+      codemaker_intro
+    elsif codebreaker.human
+      codebreaker_intro
+    end
+  end
+
+  def codemaker_intro
+    puts 'As a CodeMaker, you have to enter a 4 digit code.'
+    puts 'The code can only be made of integers from 1 to 6. Duplicate integers allowed.'
+    puts 'The computer will try to guess your code in 12 tries. Good luck!'
+    puts
+  end
+
+  def codebreaker_intro
+    puts 'As a CodeBreaker, you will have to crack a 4 digit code.'
+    puts 'The code are made of integers from 1 to 6, with duplicates allowed.'
     puts 'You have 12 chances to guess the code. Get crackin.'
     puts
   end

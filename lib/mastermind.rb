@@ -58,14 +58,20 @@ end
 
 # the one that tries to break the code; in this first case the Player
 class CodeBreaker
-  attr_accessor :guess
+  attr_accessor :computer, :human, :guess
 
   def initialize
-    @guess = Array.new(4, 0)
+    @computer = false
+    @human = true
+    @guess = [0, 0, 0, 0]
   end
 
   def update_guess
-    @guess = Human.update_array
+    @guess = if human
+               Human.update_array
+             elsif computer
+               Computer.random_digits
+             end
     display
   end
 

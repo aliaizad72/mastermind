@@ -48,21 +48,33 @@ class Computer
   end
 end
 
-# the one that plays the role of CodeMaker
-class CodeMaker
+# class Role which is the abstraction above CodeMaker & CodeBreaker
+class Role
   attr_accessor :human, :digit_array
 
   def initialize(human: false)
     @human = human
     @digit_array = [0, 0, 0, 0]
+    @array_name = nil
   end
 
   def set_digit_array
     @digit_array = if human
-              Human.update_array
-            else
-              Computer.random_digits
-            end
+                     Human.update_array
+                   else
+                     Computer.random_digits
+                   end
+  end
+
+  def display
+    puts "Your #{array_name}: #{digit_array.join('')}"
+  end
+end
+
+# the one that plays the role of CodeMaker
+class CodeMaker < Role
+  def array_name
+    'code'
   end
 
   def intro
@@ -71,28 +83,16 @@ class CodeMaker
     puts 'The computer will try to guess your code in 12 tries. Good luck!'
     puts
   end
-
-  # temp method to ensure things are working well
-  def display_digit_array
-    puts "Code: #{digit_array.join('')} " # remove 'code' when game done!
-  end
 end
 
 # the one that tries to break the code; in this first case the Player
-class CodeBreaker
-  attr_accessor :human, :digit_array
-
-  def initialize(human: true)
-    @human = human
-    @digit_array = [0, 0, 0, 0]
+class CodeBreaker < Role
+  def array_name
+    'guess'
   end
 
-  def update_digit_array
-    @digit_array = if human
-                     Human.update_array
-                   else
-                     Computer.random_digits
-                   end
+  def set_digit_array
+    super
     display
   end
 
@@ -101,10 +101,6 @@ class CodeBreaker
     puts 'The code are made of integers from 1 to 6, with duplicates allowed.'
     puts 'You have 12 chances to guess the code. Get crackin.'
     puts
-  end
-
-  def display
-    puts "Your guess: #{digit_array.join('')}"
   end
 end
 
@@ -138,7 +134,7 @@ class Game
     i = 1
     until i > 12 || all_correct?
       puts "Round #{i}"
-      codebreaker.update_digit_array
+      codebreaker.set_digit_array
       feedback
       puts
       i += 1

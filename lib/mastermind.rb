@@ -18,7 +18,7 @@ class Human
     'codebreaker' if input == '2'
   end
 
-  def self.ask_code
+  def self.ask_digit_array
     input = 'empty'
     n = 0
     until input.length == 4 && input.to_i.positive?
@@ -34,7 +34,7 @@ class Human
   end
 
   def self.update_array
-    Human.ask_code.split('').map(&:to_i)
+    Human.ask_digit_array.split('').map(&:to_i)
   end
 end
 
@@ -50,15 +50,15 @@ end
 
 # the one that plays the role of CodeMaker
 class CodeMaker
-  attr_accessor :human, :code
+  attr_accessor :human, :digit_array
 
   def initialize(human: false)
     @human = human
-    @code = [0, 0, 0, 0]
+    @digit_array = [0, 0, 0, 0]
   end
 
-  def set_code
-    @code = if human
+  def set_digit_array
+    @digit_array = if human
               Human.update_array
             else
               Computer.random_digits
@@ -73,26 +73,26 @@ class CodeMaker
   end
 
   # temp method to ensure things are working well
-  def display_code
-    puts "Code: #{code.join('')} " # remove 'code' when game done!
+  def display_digit_array
+    puts "Code: #{digit_array.join('')} " # remove 'code' when game done!
   end
 end
 
 # the one that tries to break the code; in this first case the Player
 class CodeBreaker
-  attr_accessor :human, :guess
+  attr_accessor :human, :digit_array
 
   def initialize(human: true)
     @human = human
-    @guess = [0, 0, 0, 0]
+    @digit_array = [0, 0, 0, 0]
   end
 
-  def update_guess
-    @guess = if human
-               Human.update_array
-             else
-               Computer.random_digits
-             end
+  def update_digit_array
+    @digit_array = if human
+                     Human.update_array
+                   else
+                     Computer.random_digits
+                   end
     display
   end
 
@@ -104,7 +104,7 @@ class CodeBreaker
   end
 
   def display
-    puts "Your guess: #{guess.join('')}"
+    puts "Your guess: #{digit_array.join('')}"
   end
 end
 
@@ -115,7 +115,7 @@ class Game
   def initialize
     create_players
     intro
-    @codemaker.set_code
+    @codemaker.set_digit_array
   end
 
   def create_players
@@ -138,7 +138,7 @@ class Game
     i = 1
     until i > 12 || all_correct?
       puts "Round #{i}"
-      codebreaker.update_guess
+      codebreaker.update_digit_array
       feedback
       puts
       i += 1
@@ -155,7 +155,7 @@ class Game
   end
 
   def all_correct?
-    codebreaker.guess == codemaker.code
+    codebreaker.digit_array == codemaker.digit_array
   end
 
   def feedback
@@ -178,8 +178,8 @@ class Game
   def count_correct_pos
     correct_pos_count = 0
 
-    codemaker.code.each_with_index do |digit, index|
-      correct_pos_count += 1 if digit == codebreaker.guess[index]
+    codemaker.digit_array.each_with_index do |digit, index|
+      correct_pos_count += 1 if digit == codebreaker.digit_array[index]
     end
 
     correct_pos_count
@@ -187,11 +187,11 @@ class Game
 
   def count_correct_digit
     correct_digit_count = 0
-    digits_in_code_and_guess = codebreaker.guess.select { |digit| codemaker.code.include?(digit) }.uniq
+    digits_in_code_and_guess = codebreaker.digit_array.select { |digit| codemaker.digit_array.include?(digit) }.uniq
 
     digits_in_code_and_guess.each do |digit|
-      digit_count_in_code = codemaker.code.count(digit)
-      digit_count_in_guess = codebreaker.guess.count(digit)
+      digit_count_in_code = codemaker.digit_array.count(digit)
+      digit_count_in_guess = codebreaker.digit_array.count(digit)
 
       correct_digit_count += if digit_count_in_guess < digit_count_in_code
                                digit_count_in_guess

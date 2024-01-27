@@ -12,6 +12,7 @@ class Human
       input = gets.chomp
       i += 1
     end
+    puts
     return 'codemaker' if input == '1'
 
     'codebreaker' if input == '2'
@@ -49,19 +50,18 @@ end
 
 # the one that plays the role of CodeMaker
 class CodeMaker
-  attr_accessor :computer, :human, :code
+  attr_accessor :human, :code
 
-  def initialize(computer: true, human: false)
-    @computer = computer
+  def initialize(human: false)
     @human = human
     @code = [0, 0, 0, 0]
   end
 
   def set_code
-    @code = if computer
-              Computer.random_digits
-            elsif human
+    @code = if human
               Human.update_array
+            else
+              Computer.random_digits
             end
   end
 
@@ -73,10 +73,9 @@ end
 
 # the one that tries to break the code; in this first case the Player
 class CodeBreaker
-  attr_accessor :computer, :human, :guess
+  attr_accessor :human, :guess
 
-  def initialize(computer: false, human: true)
-    @computer = computer
+  def initialize(human: true)
     @human = human
     @guess = [0, 0, 0, 0]
   end
@@ -84,7 +83,7 @@ class CodeBreaker
   def update_guess
     @guess = if human
                Human.update_array
-             elsif computer
+             else
                Computer.random_digits
              end
     display
@@ -109,15 +108,15 @@ class Game
     human_role = Human.ask_role
 
     @codemaker = if human_role == 'codemaker'
-                   CodeMaker.new(computer: false, human: true)
+                   CodeMaker.new(human: true)
                  else
-                   CodeMaker.new(computer: true, human: false)
+                   CodeMaker.new(human: false)
                  end
 
     @codebreaker = if human_role == 'codebreaker'
-                     CodeBreaker.new(computer: false, human: true)
+                     CodeBreaker.new(human: true)
                    else
-                     CodeBreaker.new(computer: true, human: false)
+                     CodeBreaker.new(human: false)
                    end
   end
 

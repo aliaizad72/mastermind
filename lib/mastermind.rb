@@ -65,6 +65,13 @@ class CodeMaker
             end
   end
 
+  def intro
+    puts 'As a CodeMaker, you have to enter a 4 digit code.'
+    puts 'The code can only be made of integers from 1 to 6. Duplicate integers allowed.'
+    puts 'The computer will try to guess your code in 12 tries. Good luck!'
+    puts
+  end
+
   # temp method to ensure things are working well
   def display_code
     puts "Code: #{code.join('')} " # remove 'code' when game done!
@@ -87,6 +94,13 @@ class CodeBreaker
                Computer.random_digits
              end
     display
+  end
+
+  def intro
+    puts 'As a CodeBreaker, you will have to crack a 4 digit code.'
+    puts 'The code are made of integers from 1 to 6, with duplicates allowed.'
+    puts 'You have 12 chances to guess the code. Get crackin.'
+    puts
   end
 
   def display
@@ -134,24 +148,10 @@ class Game
   def intro
     puts 'Welcome to Mastermind.'
     if codemaker.human
-      codemaker_intro
+      codemaker.intro
     elsif codebreaker.human
-      codebreaker_intro
+      codebreaker.intro
     end
-  end
-
-  def codemaker_intro
-    puts 'As a CodeMaker, you have to enter a 4 digit code.'
-    puts 'The code can only be made of integers from 1 to 6. Duplicate integers allowed.'
-    puts 'The computer will try to guess your code in 12 tries. Good luck!'
-    puts
-  end
-
-  def codebreaker_intro
-    puts 'As a CodeBreaker, you will have to crack a 4 digit code.'
-    puts 'The code are made of integers from 1 to 6, with duplicates allowed.'
-    puts 'You have 12 chances to guess the code. Get crackin.'
-    puts
   end
 
   def all_correct?

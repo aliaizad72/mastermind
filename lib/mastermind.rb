@@ -176,7 +176,7 @@ class Game
       puts "#{integer_count} #{digit_quantity(integer_count)} the right #{integer_quantity(integer_count)} but at the wrong #{position_quantity(integer_count)}."
     end
 
-    puts 'None of the digits in the guesses are in the code.' if position_count.zero? && integer_count.zero?
+    puts 'None of the integers in the guesses are in the code.' if position_count.zero? && integer_count.zero?
   end
 
   def count_position
@@ -191,16 +191,16 @@ class Game
 
   def count_integer
     correct_integer_count = 0
-    digits_in_code_and_guess = codebreaker.digit_array.select { |digit| codemaker.digit_array.include?(digit) }.uniq
+    common_integer = codebreaker.digit_array.select { |digit| codemaker.digit_array.include?(digit) }.uniq
 
-    digits_in_code_and_guess.each do |digit|
-      integer_count_in_code = codemaker.digit_array.count(digit)
-      integer_count_in_guess = codebreaker.digit_array.count(digit)
+    common_integer.each do |digit|
+      codemaker_integer = codemaker.digit_array.count(digit)
+      codebreaker_integer = codebreaker.digit_array.count(digit)
 
-      correct_integer_count += if integer_count_in_guess < integer_count_in_code
-                                 integer_count_in_guess
+      correct_integer_count += if codebreaker_integer < codemaker_integer
+                                 codebreaker_integer
                                else
-                                 integer_count_in_code
+                                 codemaker_integer
                                end
     end
     correct_integer_count

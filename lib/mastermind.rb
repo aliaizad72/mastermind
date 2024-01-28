@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# class Human for methods that are only specific to the user
-class Human
+# class Input for methods that take input from the user
+class Input
   def self.ask_role
     input = '0'
     i = 0
@@ -32,10 +32,6 @@ class Human
     end
     input
   end
-
-  def self.update_array
-    Human.ask_digit_array.split('').map(&:to_i)
-  end
 end
 
 # class Computer for methods that are specific to the computer
@@ -59,10 +55,14 @@ class Role
 
   def set_digit_array
     @digit_array = if human
-                     Human.update_array
+                     digit_array_from_input
                    else
                      Computer.random_digits
                    end
+  end
+
+  def digit_array_from_input
+    Input.ask_digit_array.split('').map(&:to_i)
   end
 
   def display
@@ -123,7 +123,7 @@ class Game
   end
 
   def create_players
-    human_role = Human.ask_role
+    human_role = Input.ask_role
 
     @codemaker = if human_role == 'codemaker'
                    CodeMaker.new(human: true)

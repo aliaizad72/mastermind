@@ -112,18 +112,18 @@ class CodeBreaker < Role
   end
 end
 
-# class Counter to count position and integers in the code
-class Counter
-  def self.count_position(array1, array2)
+# extending Array with method specific to this game
+class Array
+  def count_position(array)
     correct_position_count = 0
-    array1.each_with_index { |digit, index| correct_position_count += 1 if digit == array2[index] }
+    each_with_index { |digit, index| correct_position_count += 1 if digit == array[index] }
     correct_position_count
   end
 
-  def self.sum_lowest_common_integer(array1, array2)
+  def sum_lowest_common_integer(array)
     correct_integer_count = 0
-    common_integer = array1.intersection(array2)
-    common_integer.each { |digit| correct_integer_count += [array1.count(digit), array2.count(digit)].min }
+    common_integer = intersection(array)
+    common_integer.each { |digit| correct_integer_count += [count(digit), array.count(digit)].min }
     correct_integer_count
   end
 end
@@ -166,8 +166,8 @@ class Game
   end
 
   def feedback
-    position_count = Counter.count_position(codemaker.digit_array, codebreaker.digit_array)
-    integer_count = Counter.sum_lowest_common_integer(codemaker.digit_array, codebreaker.digit_array)
+    position_count = codemaker.digit_array.count_position(codebreaker.digit_array)
+    integer_count = codemaker.digit_array.sum_lowest_common_integer(codebreaker.digit_array)
 
     integer_count -= position_count if integer_count.positive? && position_count.positive?
 

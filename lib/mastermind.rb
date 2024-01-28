@@ -13,9 +13,9 @@ class Input
       i += 1
     end
     puts
-    return 'codemaker' if input == '1'
+    return [CodeMaker.new(human: true), CodeBreaker.new(human: false)] if input == '1'
 
-    'codebreaker' if input == '2'
+    [CodeMaker.new(human: false), CodeBreaker.new(human: true)] if input == '2'
   end
 
   def self.ask_digit_array
@@ -114,7 +114,7 @@ end
 
 # controlling game flows from here
 class Game
-  attr_reader :codemaker, :codebreaker
+  attr_accessor :human, :codemaker, :codebreaker
 
   def initialize
     create_players
@@ -123,19 +123,10 @@ class Game
   end
 
   def create_players
-    human_role = Input.ask_role
-
-    @codemaker = if human_role == 'codemaker'
-                   CodeMaker.new(human: true)
-                 else
-                   CodeMaker.new(human: false)
-                 end
-
-    @codebreaker = if human_role == 'codebreaker'
-                     CodeBreaker.new(human: true)
-                   else
-                     CodeBreaker.new(human: false)
-                   end
+    @players = Input.ask_role
+    @codemaker = @players.select { |player| player.instance_of? CodeMaker } [0]
+    @codebreaker = @players.select { |player| player.instance_of? CodeBreaker } [0]
+    @human = @players.select(&:human) [0]
   end
 
   def play
@@ -151,11 +142,7 @@ class Game
 
   def intro
     puts 'Welcome to Mastermind.'
-    if codemaker.human
-      codemaker.intro
-    elsif codebreaker.human
-      codebreaker.intro
-    end
+    @human.intro
   end
 
   def all_correct?

@@ -55,7 +55,6 @@ class Role
   def initialize(human: false)
     @human = human
     @digit_array = [0, 0, 0, 0]
-    @array_name = nil
   end
 
   def set_digit_array
@@ -69,6 +68,13 @@ class Role
   def display
     puts "Your #{array_name}: #{digit_array.join('')}"
   end
+
+  def intro
+    puts "As a #{self.class}, you have to crack a 4 digit code. \n" \
+         "The code #{auxilary_verb} made of integers from 1 to 6, with duplicates allowed. \n" \
+         "#{codebreaker.capitalize} have 12 chances to guess the code. Good luck! \n" \
+         "\n"
+  end
 end
 
 # the one that plays the role of CodeMaker
@@ -77,11 +83,12 @@ class CodeMaker < Role
     'code'
   end
 
-  def intro
-    puts 'As a CodeMaker, you have to enter a 4 digit code.'
-    puts 'The code can only be made of integers from 1 to 6. Duplicate integers allowed.'
-    puts 'The computer will try to guess your code in 12 tries. Good luck!'
-    puts
+  def auxilary_verb
+    'should be'
+  end
+
+  def codebreaker
+    'the computer'
   end
 end
 
@@ -91,16 +98,17 @@ class CodeBreaker < Role
     'guess'
   end
 
+  def auxilary_verb
+    'are'
+  end
+
+  def codebreaker
+    'you'
+  end
+
   def set_digit_array
     super
     display
-  end
-
-  def intro
-    puts 'As a CodeBreaker, you will have to crack a 4 digit code.'
-    puts 'The code are made of integers from 1 to 6, with duplicates allowed.'
-    puts 'You have 12 chances to guess the code. Get crackin.'
-    puts
   end
 end
 

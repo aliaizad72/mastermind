@@ -163,47 +163,47 @@ class Game
   end
 
   def feedback
-    pos_count = count_correct_pos
-    digit_count = count_correct_digit
+    position_count = count_position
+    integer_count = count_integer
 
-    digit_count -= pos_count if digit_count.positive? && pos_count.positive?
+    integer_count -= position_count if integer_count.positive? && position_count.positive?
 
-    if pos_count.positive?
-      puts "#{pos_count} #{digit_quantity(pos_count)} at the right #{position_quantity(pos_count)}."
+    if position_count.positive?
+      puts "#{position_count} #{digit_quantity(position_count)} at the right #{position_quantity(position_count)}."
     end
 
-    if digit_count.positive?
-      puts "#{digit_count} #{digit_quantity(digit_count)} the right #{integer_quantity(digit_count)} but at the wrong #{position_quantity(digit_count)}."
+    if integer_count.positive?
+      puts "#{integer_count} #{digit_quantity(integer_count)} the right #{integer_quantity(integer_count)} but at the wrong #{position_quantity(integer_count)}."
     end
 
-    puts 'None of the digits in the guesses are in the code.' if pos_count.zero? && digit_count.zero?
+    puts 'None of the digits in the guesses are in the code.' if position_count.zero? && integer_count.zero?
   end
 
-  def count_correct_pos
-    correct_pos_count = 0
+  def count_position
+    correct_position_count = 0
 
     codemaker.digit_array.each_with_index do |digit, index|
-      correct_pos_count += 1 if digit == codebreaker.digit_array[index]
+      correct_position_count += 1 if digit == codebreaker.digit_array[index]
     end
 
-    correct_pos_count
+    correct_position_count
   end
 
-  def count_correct_digit
-    correct_digit_count = 0
+  def count_integer
+    correct_integer_count = 0
     digits_in_code_and_guess = codebreaker.digit_array.select { |digit| codemaker.digit_array.include?(digit) }.uniq
 
     digits_in_code_and_guess.each do |digit|
-      digit_count_in_code = codemaker.digit_array.count(digit)
-      digit_count_in_guess = codebreaker.digit_array.count(digit)
+      integer_count_in_code = codemaker.digit_array.count(digit)
+      integer_count_in_guess = codebreaker.digit_array.count(digit)
 
-      correct_digit_count += if digit_count_in_guess < digit_count_in_code
-                               digit_count_in_guess
-                             else
-                               digit_count_in_code
-                             end
+      correct_integer_count += if integer_count_in_guess < integer_count_in_code
+                                 integer_count_in_guess
+                               else
+                                 integer_count_in_code
+                               end
     end
-    correct_digit_count
+    correct_integer_count
   end
 
   def digit_quantity(digit)

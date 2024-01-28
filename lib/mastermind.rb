@@ -18,7 +18,7 @@ class Input
     [CodeMaker.new(human: false), CodeBreaker.new(human: true)] if input == '2'
   end
 
-  def self.ask_digit_array # rubocop:disable Metrics/MethodLength
+  def self.ask_array # rubocop:disable Metrics/MethodLength
     input = 'empty'
     n = 0
     until input.length == 4 && input.to_i.positive?
@@ -46,27 +46,27 @@ end
 
 # class Role which is the abstraction above CodeMaker & CodeBreaker
 class Role
-  attr_accessor :human, :digit_array
+  attr_accessor :human, :array
 
   def initialize(human: false)
     @human = human
-    @digit_array = [0, 0, 0, 0]
+    @array = [0, 0, 0, 0]
   end
 
-  def set_digit_array
-    @digit_array = if human
-                     digit_array_from_input
+  def set_array
+    @array = if human
+                     array_from_input
                    else
                      Computer.random_digits
                    end
   end
 
-  def digit_array_from_input
-    Input.ask_digit_array.split('').map(&:to_i)
+  def array_from_input
+    Input.ask_array.split('').map(&:to_i)
   end
 
   def display
-    puts "Your #{array_name}: #{digit_array.join('')}"
+    puts "Your #{array_name}: #{array.join('')}"
   end
 
   def intro
@@ -106,7 +106,7 @@ class CodeBreaker < Role
     'you'
   end
 
-  def set_digit_array
+  def set_array
     super
     display
   end
@@ -135,7 +135,7 @@ class Game
   def initialize
     create_players
     intro
-    @codemaker.set_digit_array
+    @codemaker.set_array
   end
 
   def create_players
@@ -149,7 +149,7 @@ class Game
     i = 1
     until i > 12 || all_correct?
       puts "Round #{i}"
-      codebreaker.set_digit_array
+      codebreaker.set_array
       feedback
       puts
       i += 1
@@ -162,12 +162,12 @@ class Game
   end
 
   def all_correct?
-    codebreaker.digit_array == codemaker.digit_array
+    codebreaker.array == codemaker.array
   end
 
   def feedback
-    position_count = codemaker.digit_array.count_position(codebreaker.digit_array)
-    integer_count = codemaker.digit_array.sum_lowest_common_integer(codebreaker.digit_array)
+    position_count = codemaker.array.count_position(codebreaker.array)
+    integer_count = codemaker.array.sum_lowest_common_integer(codebreaker.array)
 
     integer_count -= position_count if integer_count.positive? && position_count.positive?
 

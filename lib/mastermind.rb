@@ -2,7 +2,7 @@
 
 # class Input for methods that take input from the user
 class Input
-  def self.ask_role
+  def self.ask_role # rubocop:disable Metrics/MethodLength
     input = '0'
     i = 0
 
@@ -18,7 +18,7 @@ class Input
     [CodeMaker.new(human: false), CodeBreaker.new(human: true)] if input == '2'
   end
 
-  def self.ask_digit_array
+  def self.ask_digit_array # rubocop:disable Metrics/MethodLength
     input = 'empty'
     n = 0
     until input.length == 4 && input.to_i.positive?
@@ -112,6 +112,22 @@ class CodeBreaker < Role
   end
 end
 
+# class Counter to count position and integers in the code
+class Counter
+  def self.count_position(array1, array2)
+    correct_position_count = 0
+    array1.each_with_index { |digit, index| correct_position_count += 1 if digit == array2[index] }
+    correct_position_count
+  end
+
+  def self.sum_lowest_common_integer(array1, array2)
+    correct_integer_count = 0
+    common_integer = array1.intersection(array2)
+    common_integer.each { |digit| correct_integer_count += [array1.count(digit), array2.count(digit)].min }
+    correct_integer_count
+  end
+end
+
 # controlling game flows from here
 class Game
   attr_accessor :human, :codemaker, :codebreaker
@@ -150,8 +166,8 @@ class Game
   end
 
   def feedback
-    position_count = count_position
-    integer_count = count_integer
+    position_count = Counter.count_position(codemaker.digit_array, codebreaker.digit_array)
+    integer_count = Counter.sum_lowest_common_integer(codemaker.digit_array, codebreaker.digit_array)
 
     integer_count -= position_count if integer_count.positive? && position_count.positive?
 
@@ -164,33 +180,6 @@ class Game
     end
 
     puts 'None of the integers in the guesses are in the code.' if position_count.zero? && integer_count.zero?
-  end
-
-  def count_position
-    correct_position_count = 0
-
-    codemaker.digit_array.each_with_index do |digit, index|
-      correct_position_count += 1 if digit == codebreaker.digit_array[index]
-    end
-
-    correct_position_count
-  end
-
-  def count_integer
-    correct_integer_count = 0
-    common_integer = codebreaker.digit_array.select { |digit| codemaker.digit_array.include?(digit) }.uniq
-
-    common_integer.each do |digit|
-      codemaker_integer = codemaker.digit_array.count(digit)
-      codebreaker_integer = codebreaker.digit_array.count(digit)
-
-      correct_integer_count += if codebreaker_integer < codemaker_integer
-                                 codebreaker_integer
-                               else
-                                 codemaker_integer
-                               end
-    end
-    correct_integer_count
   end
 
   def digit_quantity(digit)

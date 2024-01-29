@@ -1,6 +1,6 @@
 # controlling game flows from here
 class Game
-  attr_accessor :human, :codemaker, :codebreaker
+  attr_accessor :human, :codemaker, :codebreaker, :integer_count, :position_count
 
   def initialize
     create_players
@@ -20,6 +20,7 @@ class Game
     until i > 12 || all_correct?
       puts "Round #{i}"
       codebreaker.set_array
+      count
       feedback
       puts
       i += 1
@@ -28,28 +29,35 @@ class Game
 
   def intro
     puts 'Welcome to Mastermind.'
-    @human.intro
+    human.intro
   end
 
   def all_correct?
     codebreaker.array == codemaker.array
   end
 
+  def count
+    @position_count = codemaker.array.count_position(codebreaker.array)
+    @integer_count = codemaker.array.sum_lowest_common_integer(codebreaker.array)
+    @integer_count -= @position_count if integer_count.positive? && position_count.positive?
+  end
+
   def feedback
-    position_count = codemaker.array.count_position(codebreaker.array)
-    integer_count = codemaker.array.sum_lowest_common_integer(codebreaker.array)
+    right_position if position_count.positive?
+    right_integer if integer_count.positive?
+    none_correct if position_count.zero? && integer_count.zero?
+  end
 
-    integer_count -= position_count if integer_count.positive? && position_count.positive?
+  def right_position
+    puts "#{position_count} #{digit_quantity(position_count)} at the right #{position_quantity(position_count)}."
+  end
 
-    if position_count.positive?
-      puts "#{position_count} #{digit_quantity(position_count)} at the right #{position_quantity(position_count)}."
-    end
+  def right_integer
+    puts "#{integer_count} #{digit_quantity(integer_count)} the right #{integer_quantity(integer_count)} but at the wrong #{position_quantity(integer_count)}."
+  end
 
-    if integer_count.positive?
-      puts "#{integer_count} #{digit_quantity(integer_count)} the right #{integer_quantity(integer_count)} but at the wrong #{position_quantity(integer_count)}."
-    end
-
-    puts 'None of the integers in the guesses are in the code.' if position_count.zero? && integer_count.zero?
+  def none_correct
+    puts 'None of the integers in the guesses are in the code.'
   end
 
   def digit_quantity(digit)
@@ -205,4 +213,14 @@ class Array
   end
 end
 
+# extending class Integer for output in the feedback
+class Integer
+  def to_be
+    if self == 1
+      'is'
+    else
+      'are'
+    end
+  end
+end
 Game.new.play

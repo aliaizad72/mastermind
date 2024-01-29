@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+require 'colorize'
+
 # controlling game flows from here
 class Game
   attr_accessor :human, :codemaker, :codebreaker, :integer_count, :position_count
@@ -18,11 +21,10 @@ class Game
   def play
     i = 1
     until i > 12 || all_correct?
-      puts "Round #{i}"
+      puts "\nRound #{i}"
       codebreaker.set_array
       count
       feedback
-      puts
       i += 1
     end
   end
@@ -43,45 +45,16 @@ class Game
   end
 
   def feedback
-    right_position if position_count.positive?
-    right_integer if integer_count.positive?
-    none_correct if position_count.zero? && integer_count.zero?
+    print_position_count
+    print_integer_count
   end
 
-  def right_position
-    puts "#{position_count} #{digit_quantity(position_count)} at the right #{position_quantity(position_count)}."
+  def print_position_count
+    puts "Right integer, right position: #{position_count}".colorize(:color => :green, :mode => :bold)
   end
 
-  def right_integer
-    puts "#{integer_count} #{digit_quantity(integer_count)} the right #{integer_quantity(integer_count)} but at the wrong #{position_quantity(integer_count)}."
-  end
-
-  def none_correct
-    puts 'None of the integers in the guesses are in the code.'
-  end
-
-  def digit_quantity(digit)
-    if digit == 1
-      'digit is'
-    else
-      'digits are'
-    end
-  end
-
-  def integer_quantity(digit)
-    if digit == 1
-      'integer'
-    else
-      'integers'
-    end
-  end
-
-  def position_quantity(digit)
-    if digit == 1
-      'position'
-    else
-      'positions'
-    end
+  def print_integer_count
+    puts "Right integer, wrong position: #{integer_count}".colorize(:color => :blue, :mode => :bold)
   end
 end
 
@@ -134,6 +107,7 @@ class Role
              else
                Computer.random_digits
              end
+    display
   end
 
   def array_from_input
@@ -180,11 +154,6 @@ class CodeBreaker < Role
   def codebreaker
     'you'
   end
-
-  def set_array
-    super
-    display
-  end
 end
 
 # class Computer for methods that are specific to the computer
@@ -213,14 +182,4 @@ class Array
   end
 end
 
-# extending class Integer for output in the feedback
-class Integer
-  def to_be
-    if self == 1
-      'is'
-    else
-      'are'
-    end
-  end
-end
 Game.new.play

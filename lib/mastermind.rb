@@ -79,11 +79,11 @@ class Input
   def self.ask_array # rubocop:disable Metrics/MethodLength
     input = 'empty'
     n = 0
-    until input.length == 4 && input.to_i.positive?
+    until input.length == 4 && input.integer? && input.in_range?
       if n.zero?
         print 'Enter the 4 digit code: '
       else
-        print 'Please enter 4 digits and integers only. Try again: '
+        print 'Please enter 4 digits and integers from 1 to 6 only. Try again: '
       end
       input = gets.chomp
       n += 1
@@ -115,7 +115,15 @@ class Role
   end
 
   def display
-    puts "Your #{array_name}: #{array.join('')}"
+    puts "#{whose_array.capitalize} #{array_name}: #{array.join('')}" if instance_of? CodeBreaker
+  end
+
+  def whose_array
+    if human
+      'your'
+    else
+      "computer's"
+    end
   end
 
   def intro
@@ -163,6 +171,17 @@ class Computer
     sample_digits = []
     4.times { sample_digits.push(digits.sample) }
     sample_digits
+  end
+end
+
+# extending String to incorporate methods specific to this game
+class String
+  def in_range?
+    split('').map(&:to_i).all? { |int| int.between?(1, 6) }
+  end
+
+  def integer?
+    to_i.positive?
   end
 end
 

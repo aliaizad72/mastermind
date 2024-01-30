@@ -94,10 +94,11 @@ end
 
 # class Role which is the abstraction above CodeMaker & CodeBreaker
 class Role
-  attr_accessor :human, :array
+  attr_accessor :human, :array, :computer
 
   def initialize(human: false)
     @human = human
+    @computer = Computer.new unless human
     @array = [0, 0, 0, 0]
   end
 
@@ -105,7 +106,7 @@ class Role
     @array = if human
                array_from_input
              else
-               Computer.random_digits
+               computer.random_digits
              end
     display
   end
@@ -166,11 +167,20 @@ end
 
 # class Computer for methods that are specific to the computer
 class Computer
-  def self.random_digits
-    digits = (1..6).to_a
-    sample_digits = []
-    4.times { sample_digits.push(digits.sample) }
-    sample_digits
+  attr_reader :all_possible_combo
+
+  def initialize
+    @all_possible_combo = create_all_combo
+  end
+
+  def create_all_combo
+    combo = []
+    (1..6).to_a.repeated_permutation(4) { |perm| combo.push(perm) }
+    combo
+  end
+
+  def random_digits
+    all_possible_combo.sample
   end
 end
 

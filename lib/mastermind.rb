@@ -50,11 +50,11 @@ class Game
   end
 
   def print_position_count
-    puts "Right integer, right position: #{position_count}".colorize(:color => :green, :mode => :bold)
+    puts "Right integer, right position: #{position_count}".colorize(color: :green, mode: :bold)
   end
 
   def print_integer_count
-    puts "Right integer, wrong position: #{integer_count}".colorize(:color => :blue, :mode => :bold)
+    puts "Right integer, wrong position: #{integer_count}".colorize(color: :blue, mode: :bold)
   end
 end
 

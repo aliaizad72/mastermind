@@ -1,9 +1,24 @@
 # frozen_string_literal: true
 require 'colorize'
 
-# module Input for methods that take input from the user
-module Input
-  def ask_role # rubocop:disable Metrics/MethodLength
+# controlling game flows from here
+class Game
+  attr_accessor :human, :codemaker, :codebreaker, :integer_count, :position_count
+
+  def initialize
+    create_players
+    intro
+    codemaker.set_array
+  end
+
+  def create_players
+    @players = role_factory
+    @codemaker = @players.select { |player| player.instance_of? CodeMaker } [0]
+    @codebreaker = @players.select { |player| player.instance_of? CodeBreaker } [0]
+    @human = @players.select(&:human) [0]
+  end
+
+  def role_factory # rubocop:disable Metrics/MethodLength
     input = '0'
     i = 0
 
@@ -17,40 +32,6 @@ module Input
     return [CodeMaker.new(human: true), CodeBreaker.new(human: false)] if input == '1'
 
     [CodeMaker.new(human: false), CodeBreaker.new(human: true)] if input == '2'
-  end
-
-  def ask_array # rubocop:disable Metrics/MethodLength
-    input = 'empty'
-    n = 0
-    until input.length == 4 && input.integer? && input.in_range?
-      if n.zero?
-        print 'Enter the 4 digit code: '
-      else
-        print 'Please enter 4 digits and integers from 1 to 6 only. Try again: '
-      end
-      input = gets.chomp
-      n += 1
-    end
-    input
-  end
-end
-
-# controlling game flows from here
-class Game
-  include Input
-  attr_accessor :human, :codemaker, :codebreaker, :integer_count, :position_count
-
-  def initialize
-    create_players
-    intro
-    codemaker.set_array
-  end
-
-  def create_players
-    @players = ask_role
-    @codemaker = @players.select { |player| player.instance_of? CodeMaker } [0]
-    @codebreaker = @players.select { |player| player.instance_of? CodeBreaker } [0]
-    @human = @players.select(&:human) [0]
   end
 
   def play
@@ -95,7 +76,6 @@ end
 
 # class Role which is the abstraction above CodeMaker & CodeBreaker
 class Role
-  include Input
   attr_accessor :human, :computer, :array, :current_score
 
   def initialize(human: false)
@@ -106,15 +86,26 @@ class Role
 
   def set_array
     @array = if human
-               array_from_input
+               ask_array
              else
                computer.random_digits
              end
     display
   end
 
-  def array_from_input
-    ask_array.split('').map(&:to_i)
+  def ask_array # rubocop:disable Metrics/MethodLength
+    input = 'empty'
+    n = 0
+    until input.length == 4 && input.integer? && input.in_range?
+      if n.zero?
+        print 'Enter the 4 digit code: '
+      else
+        print 'Please enter 4 digits and integers from 1 to 6 only. Try again: '
+      end
+      input = gets.chomp
+      n += 1
+    end
+    input.split('').map(&:to_i)
   end
 
   def display

@@ -85,12 +85,7 @@ class Role
   end
 
   def set_array
-    @array = if human
-               ask_array
-             else
-               computer.random_digits
-             end
-    display
+    @array = ask_array if human
   end
 
   def ask_array # rubocop:disable Metrics/MethodLength
@@ -130,6 +125,12 @@ end
 
 # the one that plays the role of CodeMaker
 class CodeMaker < Role
+  def set_array
+    super
+    @array = computer.random_digits unless human
+    display
+  end
+
   def array_name
     'code'
   end
@@ -145,9 +146,10 @@ end
 
 # the one that tries to break the code; in this first case the Player
 class CodeBreaker < Role
-  def initialize(human: false)
+  def set_array
     super
-    @current_score = [0, 0]
+    @array = computer.update_array unless human
+    display
   end
 
   def array_name
@@ -179,6 +181,10 @@ class Computer
 
   def random_digits
     all_possible_combo.sample
+  end
+  
+  def update_array
+    random_digits
   end
 end
 

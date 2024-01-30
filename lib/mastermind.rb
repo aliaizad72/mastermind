@@ -1,18 +1,53 @@
 # frozen_string_literal: true
 require 'colorize'
 
+# module Input for methods that take input from the user
+module Input
+  def ask_role # rubocop:disable Metrics/MethodLength
+    input = '0'
+    i = 0
+
+    until %w[1 2].include?(input)
+      print 'Enter 1 to be the CodeMaker, or enter 2 to be the CodeBreaker: ' if i.zero?
+      print 'Please enter 1 or 2 only! Try again: ' if i.positive?
+      input = gets.chomp
+      i += 1
+    end
+    puts
+    return [CodeMaker.new(human: true), CodeBreaker.new(human: false)] if input == '1'
+
+    [CodeMaker.new(human: false), CodeBreaker.new(human: true)] if input == '2'
+  end
+
+  def ask_array # rubocop:disable Metrics/MethodLength
+    input = 'empty'
+    n = 0
+    until input.length == 4 && input.integer? && input.in_range?
+      if n.zero?
+        print 'Enter the 4 digit code: '
+      else
+        print 'Please enter 4 digits and integers from 1 to 6 only. Try again: '
+      end
+      input = gets.chomp
+      n += 1
+    end
+    input
+  end
+end
+
 # controlling game flows from here
 class Game
+  include Input
   attr_accessor :human, :codemaker, :codebreaker, :integer_count, :position_count
 
   def initialize
     create_players
     intro
-    @codemaker.set_array
+    codemaker.set_array
   end
 
   def create_players
-    @players = Input.ask_role
+    @players = ask_role
     @codemaker = @players.select { |player| player.instance_of? CodeMaker } [0]
     @codebreaker = @players.select { |player| player.instance_of? CodeBreaker } [0]
     @human = @players.select(&:human) [0]
@@ -58,43 +93,10 @@ class Game
   end
 end
 
-# class Input for methods that take input from the user
-class Input
-  def self.ask_role # rubocop:disable Metrics/MethodLength
-    input = '0'
-    i = 0
-
-    until %w[1 2].include?(input)
-      print 'Enter 1 to be the CodeMaker, or enter 2 to be the CodeBreaker: ' if i.zero?
-      print 'Please enter 1 or 2 only! Try again: ' if i.positive?
-      input = gets.chomp
-      i += 1
-    end
-    puts
-    return [CodeMaker.new(human: true), CodeBreaker.new(human: false)] if input == '1'
-
-    [CodeMaker.new(human: false), CodeBreaker.new(human: true)] if input == '2'
-  end
-
-  def self.ask_array # rubocop:disable Metrics/MethodLength
-    input = 'empty'
-    n = 0
-    until input.length == 4 && input.integer? && input.in_range?
-      if n.zero?
-        print 'Enter the 4 digit code: '
-      else
-        print 'Please enter 4 digits and integers from 1 to 6 only. Try again: '
-      end
-      input = gets.chomp
-      n += 1
-    end
-    input
-  end
-end
-
 # class Role which is the abstraction above CodeMaker & CodeBreaker
 class Role
-  attr_accessor :human, :array, :computer
+  include Input
+  attr_accessor :human, :computer, :array, :current_score
 
   def initialize(human: false)
     @human = human
@@ -112,7 +114,7 @@ class Role
   end
 
   def array_from_input
-    Input.ask_array.split('').map(&:to_i)
+    ask_array.split('').map(&:to_i)
   end
 
   def display
@@ -152,6 +154,11 @@ end
 
 # the one that tries to break the code; in this first case the Player
 class CodeBreaker < Role
+  def initialize(human: false)
+    super
+    @current_score = [0, 0]
+  end
+
   def array_name
     'guess'
   end

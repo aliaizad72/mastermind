@@ -167,10 +167,11 @@ end
 
 # class Computer for methods that are specific to the computer
 class Computer
-  attr_reader :all_possible_combo
+  attr_accessor :all_possible_combo, :round
 
   def initialize
     @all_possible_combo = create_all_combo
+    @round = 1
   end
 
   def create_all_combo
@@ -182,9 +183,11 @@ class Computer
   def random_digits
     all_possible_combo.sample
   end
-  
+
   def update_array
-    random_digits
+    current_guess = Array.new(4, round)
+    @round += 1 unless @round == 6
+    current_guess
   end
 end
 

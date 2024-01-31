@@ -41,6 +41,7 @@ class Game
       codebreaker.set_array
       count
       feedback
+      codebreaker.next_guess
       i += 1
     end
   end
@@ -61,6 +62,7 @@ class Game
   end
 
   def feedback
+    codebreaker.guess_feedback = [position_count, integer_count]
     print_position_count
     print_integer_count
   end
@@ -152,18 +154,20 @@ end
 
 # the one that tries to break the code; in this first case the Player
 class CodeBreaker < Role
-  attr_accessor :possible_guesses, :round
+  attr_accessor :possible_guesses, :round, :guess_feedback, :integer_combo
 
   def initialize(human: false)
     super
     @possible_guesses = list_possible_guesses
     @round = 1
+    @guess_feedback = [0, 0] # pos_score, int_score
+    @integer_combo = []
   end
 
   def list_possible_guesses
-    combo = []
-    (1..6).to_a.repeated_permutation(4) { |perm| combo.push(perm) }
-    combo
+    set = []
+    (1..6).to_a.repeated_permutation(4) { |perm| set.push(perm) }
+    set
   end
 
   def set_array
@@ -173,13 +177,33 @@ class CodeBreaker < Role
   end
 
   def update_array
-    current_guess = single_integer_guess(round)
-    @round += 1 unless @round == 6
-    current_guess
+    if integer_combo.length < 4
+      single_integer_guess
+    else
+      random_permutation
+    end
   end
 
-  def single_integer_guess(round)
+  def next_guess
+    integer = round
+    integer_feedback = guess_feedback.sum
+    integer_feedback.times { integer_combo.push(integer) }
+    create_permutations if integer_combo.length == 4
+    @round += 1
+  end
+
+  def single_integer_guess
     Array.new(4, round)
+  end
+
+  def create_permutations
+    array = []
+    integer_combo.permutation(4) { |perm| array.push(perm) }
+    @possible_guesses = array
+  end
+
+  def random_permutation
+    possible_guesses.delete(possible_guesses.sample)
   end
 
   def array_name

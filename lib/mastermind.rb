@@ -80,7 +80,6 @@ class Role
 
   def initialize(human: false)
     @human = human
-    @computer = Computer.new unless human
     @array = [0, 0, 0, 0]
   end
 
@@ -127,8 +126,15 @@ end
 class CodeMaker < Role
   def set_array
     super
-    @array = computer.random_digits unless human
+    @array = random_digits unless human
     display
+  end
+
+  def random_digits
+    num_array = (1..6).to_a
+    array = []
+    4.times { array.push(num_array.sample) }
+    array
   end
 
   def array_name
@@ -146,10 +152,34 @@ end
 
 # the one that tries to break the code; in this first case the Player
 class CodeBreaker < Role
+  attr_accessor :possible_guesses, :round
+
+  def initialize(human: false)
+    super
+    @possible_guesses = list_possible_guesses
+    @round = 1
+  end
+
+  def list_possible_guesses
+    combo = []
+    (1..6).to_a.repeated_permutation(4) { |perm| combo.push(perm) }
+    combo
+  end
+
   def set_array
     super
-    @array = computer.update_array unless human
+    @array = update_array unless human
     display
+  end
+
+  def update_array
+    current_guess = single_integer_guess(round)
+    @round += 1 unless @round == 6
+    current_guess
+  end
+
+  def single_integer_guess(round)
+    Array.new(4, round)
   end
 
   def array_name
@@ -162,32 +192,6 @@ class CodeBreaker < Role
 
   def codebreaker
     'you'
-  end
-end
-
-# class Computer for methods that are specific to the computer
-class Computer
-  attr_accessor :all_possible_combo, :round
-
-  def initialize
-    @all_possible_combo = create_all_combo
-    @round = 1
-  end
-
-  def create_all_combo
-    combo = []
-    (1..6).to_a.repeated_permutation(4) { |perm| combo.push(perm) }
-    combo
-  end
-
-  def random_digits
-    all_possible_combo.sample
-  end
-
-  def update_array
-    current_guess = Array.new(4, round)
-    @round += 1 unless @round == 6
-    current_guess
   end
 end
 

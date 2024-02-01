@@ -41,7 +41,7 @@ class Game
       codebreaker.set_array
       count
       feedback
-      codebreaker.next_guess
+      codebreaker.calculate
       i += 1
     end
   end
@@ -158,16 +158,10 @@ class CodeBreaker < Role
 
   def initialize(human: false)
     super
-    @possible_guesses = list_possible_guesses
+    @possible_guesses = nil
     @round = 1
     @guess_feedback = [0, 0] # pos_score, int_score
     @integer_combo = []
-  end
-
-  def list_possible_guesses
-    set = []
-    (1..6).to_a.repeated_permutation(4) { |perm| set.push(perm) }
-    set
   end
 
   def set_array
@@ -177,6 +171,7 @@ class CodeBreaker < Role
   end
 
   def update_array
+    create_permutations if integer_combo.length == 4 && possible_guesses.nil?
     if integer_combo.length < 4
       single_integer_guess
     else
@@ -184,11 +179,12 @@ class CodeBreaker < Role
     end
   end
 
-  def next_guess
-    integer = round
+  def calculate
     integer_feedback = guess_feedback.sum
-    integer_feedback.times { integer_combo.push(integer) }
-    create_permutations if integer_combo.length == 4
+    integer_feedback.times { integer_combo.push(round) } if round < 6
+    # the code below is to automatically fill in 6 when it is the last
+    # possible integer left
+    (4 - integer_combo.length).times { integer_combo.push(6) } if round == 5 && integer_combo.length != 4
     @round += 1
   end
 
@@ -199,7 +195,7 @@ class CodeBreaker < Role
   def create_permutations
     array = []
     integer_combo.permutation(4) { |perm| array.push(perm) }
-    @possible_guesses = array
+    @possible_guesses = array.uniq
   end
 
   def random_permutation

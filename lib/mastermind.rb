@@ -6,8 +6,9 @@ class Game
   attr_accessor :human, :codemaker, :codebreaker, :integer_count, :position_count
 
   def initialize
-    create_players
     intro
+    create_players
+    human.intro
     codemaker.set_array
   end
 
@@ -37,7 +38,7 @@ class Game
   def play
     i = 1
     until i > 12 || all_correct?
-      puts "\nRound #{i}"
+      puts "\nRound #{i}".colorize(color: :cyan, mode: :bold)
       codebreaker.set_array
       count
       feedback
@@ -47,8 +48,8 @@ class Game
   end
 
   def intro
-    puts 'Welcome to Mastermind.'
-    human.intro
+    puts 'Welcome to Mastermind!'.colorize(color: :cyan, mode: :bold)
+    puts
   end
 
   def all_correct?
@@ -68,11 +69,11 @@ class Game
   end
 
   def print_position_count
-    puts "Right integer, right position: #{position_count}".colorize(color: :green, mode: :bold)
+    puts "Right integer, right position: #{position_count}".colorize(color: :green)
   end
 
   def print_integer_count
-    puts "Right integer, wrong position: #{integer_count}".colorize(color: :blue, mode: :bold)
+    puts "Right integer, wrong position: #{integer_count}".colorize(color: :blue)
   end
 end
 
@@ -94,9 +95,9 @@ class Role
     n = 0
     until input.length == 4 && input.integer? && input.in_range?
       if n.zero?
-        print 'Enter the 4 digit code: '
+        print 'Enter the 4 digit code: '.colorize(mode: :bold)
       else
-        print 'Please enter 4 digits and integers from 1 to 6 only. Try again: '
+        print 'Please enter 4 digits and integers from 1 to 6 only. Try again: '.colorize(mode: :bold)
       end
       input = gets.chomp
       n += 1

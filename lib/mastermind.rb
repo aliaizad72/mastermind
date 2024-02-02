@@ -190,11 +190,20 @@ class CodeBreaker < Role
   end
 
   def update_array
+    enter_prompt
     create_permutations if integer_combo.length == 4 && possible_guesses.nil?
     if integer_combo.length < 4
       single_integer_guess
     else
       random_permutation
+    end
+  end
+
+  def enter_prompt
+    input = nil
+    until input == "\n"
+      puts 'Press enter to continue '
+      input = gets
     end
   end
 

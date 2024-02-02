@@ -136,7 +136,7 @@ class Role
   end
 
   def intro
-    puts "As a #{self.class}, you have to crack a 4 digit code. \n" \
+    puts "As a #{self.class}, you have to #{role_word} a 4 digit code. \n" \
          "The code #{auxilary_verb} made of integers from 1 to 6, with duplicates allowed. \n" \
          "#{codebreaker.capitalize} have 12 chances to guess the code. Good luck! \n" \
          "\n"
@@ -168,6 +168,10 @@ class CodeMaker < Role
 
   def codebreaker
     'the computer'
+  end
+  
+  def role_word
+    'create'
   end
 end
 
@@ -240,6 +244,10 @@ class CodeBreaker < Role
 
   def codebreaker
     'you'
+  end
+  
+  def role_word
+    'crack'
   end
 end
 

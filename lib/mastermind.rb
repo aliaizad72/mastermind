@@ -45,6 +45,8 @@ class Game
       codebreaker.calculate
       i += 1
     end
+    announce_winner if all_correct?
+    announce_loser if i > 12
   end
 
   def intro
@@ -74,6 +76,22 @@ class Game
 
   def print_integer_count
     puts "Right integer, wrong position: #{integer_count}".colorize(color: :blue)
+  end
+
+  def announce_winner
+    if codebreaker.human
+      puts 'Congratulations! You have cracked the code!'.colorize(color: :cyan, mode: :bold)
+    else
+      puts 'The computer has cracked your code! You lose!'.colorize(color: :red, mode: :bold)
+    end
+  end
+
+  def announce_loser
+    if codebreaker.human
+      puts 'You could not crack the code! You lose!'.colorize(color: :red, mode: :bold)
+    else
+      puts 'The computer could not crack your code, you won!'.colorize(color: :cyan, mode: :bold)
+    end
   end
 end
 
